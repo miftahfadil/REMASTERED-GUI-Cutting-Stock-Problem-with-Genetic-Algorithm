@@ -1,7 +1,9 @@
 from tkinter import *
 from typing import Dict
+from typing import List
 
 from buttons import DeleteAddColumn
+
 
 class InitiateStockProduct(Frame):
 
@@ -11,11 +13,45 @@ class InitiateStockProduct(Frame):
         self.create_gui()
 
     def create_gui(self) -> None:
-        input_stocks = InputFrame(parent=self, material="Stock")
-        input_stocks.grid(row=0, column=0)
+        self.input_stocks = InputFrame(parent=self, material="Stock")
+        self.input_stocks.grid(row=0, column=0)
 
-        input_product = InputFrame(parent=self, material="Product")
-        input_product.grid(row=0, column=1)
+        self.input_products = InputFrame(parent=self, material="Product")
+        self.input_products.grid(row=0, column=1)
+
+        button_generate = Button(master=self, text="Generate Cutting Pattern",
+                                 command=self.get_stocks_products_input)
+        button_generate.grid(row=1, column=0, columnspan=2)
+    
+    def get_stocks_products_input(self) -> None:
+        self.stocks_list: List[float] = self.get_material_input(self.input_stocks.input_material_frames)
+        self.products_list: List[float] = self.get_material_input(self.input_products.input_material_frames)
+
+        print(self.stocks_list)
+        print(self.products_list)
+    
+    def get_material_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
+        material_list: List[float] = []
+
+        for material in input_material_frames.values():
+            len_material = material.entry_len.get()
+            amt_material = material.entry_amt.get()
+
+            if len_material == '' or amt_material == '':
+                return None
+            
+            len_material = float(len_material)
+            amt_material = int(amt_material)
+
+            if (len_material > 0 and len_material <= 5000) and (amt_material > 0 and amt_material <= 2000):
+                cur_material = [len_material] * amt_material
+                material_list += cur_material
+            else:
+                return None
+
+        return material_list
+        
+         
 
 class InputFrame(Frame):
     
