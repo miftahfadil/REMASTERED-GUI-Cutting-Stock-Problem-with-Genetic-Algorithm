@@ -1,4 +1,8 @@
 from tkinter import *
+from typing import Dict
+
+from initiate_stocks_products import InitiateStockProduct
+from pattern_result import PatternResult
 
 
 class MainWindow(Tk):
@@ -7,11 +11,13 @@ class MainWindow(Tk):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.title(string="AppName")
-        self._width = 900
+        self._width = 1000
         self._height = 500
+        self._frames: Dict[str, Frame] = {}
 
         self.resizable(width=False, height=False)
         self.centering_window()
+        self.create_gui()
 
     def centering_window(self) -> None:
         _width = self._width
@@ -21,7 +27,16 @@ class MainWindow(Tk):
         x_corner = int((screen_width / 2) - (_width / 2))
         y_corner = int((screen_height / 2) - (_height / 2))
         self.geometry(f"{_width}x{_height}+{x_corner}+{y_corner}")
+    
+    def create_gui(self) -> None:
+        self.switch_frame(name_frame="Initiate Frame", new_frame=InitiateStockProduct)
+        self._frames["Initiate Frame"].button_generate.bind("<Button-1>", lambda e: self.switch_frame(name_frame="Pattern Result", new_frame=PatternResult))
 
+    def switch_frame(self, name_frame:str, new_frame: Frame) -> None:
+        for frame in self._frames.values():
+            frame.destroy()
+        self._frames[name_frame] = new_frame(parent=self)
+        self._frames[name_frame].pack(expand=TRUE)
 
 
 if __name__ == "__main__":

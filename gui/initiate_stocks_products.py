@@ -14,21 +14,18 @@ class InitiateStockProduct(Frame):
 
     def create_gui(self) -> None:
         self.input_stocks = InputFrame(parent=self, material="Stock")
-        self.input_stocks.grid(row=0, column=0)
+        self.input_stocks.grid(row=0, column=0, padx=10)
 
         self.input_products = InputFrame(parent=self, material="Product")
-        self.input_products.grid(row=0, column=1)
+        self.input_products.grid(row=0, column=1, padx=10)
 
-        button_generate = Button(master=self, text="Generate Cutting Pattern",
+        self.button_generate = Button(master=self, text="Generate Cutting Pattern",
                                  command=self.get_stocks_products_input)
-        button_generate.grid(row=1, column=0, columnspan=2)
+        self.button_generate.grid(row=1, column=0, columnspan=2)
     
     def get_stocks_products_input(self) -> None:
         self.stocks_list: List[float] = self.get_material_input(self.input_stocks.input_material_frames)
         self.products_list: List[float] = self.get_material_input(self.input_products.input_material_frames)
-
-        print(self.stocks_list)
-        print(self.products_list)
     
     def get_material_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
         material_list: List[float] = []
@@ -51,8 +48,6 @@ class InitiateStockProduct(Frame):
 
         return material_list
         
-         
-
 class InputFrame(Frame):
     
     def __init__(self, parent: Tk, material: str) -> None:
