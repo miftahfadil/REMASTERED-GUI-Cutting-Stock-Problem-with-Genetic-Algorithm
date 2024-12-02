@@ -2,7 +2,6 @@ from tkinter import *
 from typing import Dict
 
 from initiate_stocks_products import InitiateStockProduct
-from pattern_result import PatternResult
 
 
 class MainWindow(Tk):
@@ -30,7 +29,7 @@ class MainWindow(Tk):
     
     def create_gui(self) -> None:
         self.switch_frame(name_frame="Initiate Frame", new_frame=InitiateStockProduct)
-        self._frames["Initiate Frame"].button_generate.bind("<Button-1>", lambda e: self.switch_frame(name_frame="Pattern Result", new_frame=PatternResult))
+        
 
     def switch_frame(self, name_frame:str, new_frame: Frame) -> None:
         for frame in self._frames.values():

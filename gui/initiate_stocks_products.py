@@ -3,6 +3,7 @@ from typing import Dict
 from typing import List
 
 from buttons import DeleteAddColumn
+from pattern_result import PatternResult
 
 
 class InitiateStockProduct(Frame):
@@ -22,6 +23,8 @@ class InitiateStockProduct(Frame):
         self.button_generate = Button(master=self, text="Generate Cutting Pattern",
                                  command=self.get_stocks_products_input)
         self.button_generate.grid(row=1, column=0, columnspan=2)
+        self.button_generate.bind("<Button-1>",
+                                   lambda e: self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult))
     
     def get_stocks_products_input(self) -> None:
         self.stocks_list: List[float] = self.get_material_input(self.input_stocks.input_material_frames)

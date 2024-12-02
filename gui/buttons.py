@@ -27,7 +27,7 @@ class DeleteAddColumn(Frame):
         id = len(self.parent.input_material_frames)
         id += 1
 
-        if id <= 100:
+        if id <= 20:
             self.parent.input_material_frames[id] = self.column_frame(parent=self.parent.frame,
                                                                       material=self.parent.material, id=id)
             self.parent.input_material_frames[id].pack(pady=8)
