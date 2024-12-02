@@ -9,7 +9,7 @@ from pattern_result import PatternResult
 class InitiateStockProduct(Frame):
 
     def __init__(self, parent: Tk) -> None:
-        super(InitiateStockProduct, self).__init__(master= parent)
+        super(InitiateStockProduct, self).__init__(master=parent)
 
         self.create_gui()
 
@@ -23,14 +23,33 @@ class InitiateStockProduct(Frame):
         self.button_generate = Button(master=self, text="Generate Cutting Pattern",
                                  command=self.get_stocks_products_input)
         self.button_generate.grid(row=1, column=0, columnspan=2)
-        self.button_generate.bind("<Button-1>",
-                                   lambda e: self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult))
     
     def get_stocks_products_input(self) -> None:
-        self.stocks_list: List[float] = self.get_material_input(self.input_stocks.input_material_frames)
-        self.products_list: List[float] = self.get_material_input(self.input_products.input_material_frames)
+        self.stocks_list: List[float] = self.get_stocks_input(self.input_stocks.input_material_frames)
+        self.products_list: List[float] = self.get_products_input(self.input_products.input_material_frames)
+        print(self.stocks_list)
+        print(self.products_list)
+        self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult)
+
+    def get_stocks_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
+        material_list: List[float] = []
+
+        for material in input_material_frames.values():
+            len_material = material.entry_len.get()
+
+            if len_material == '':
+                return None
+            
+            len_material = float(len_material)
+
+            if (len_material > 0 and len_material <= 5000):
+                material_list.append(len_material)
+            else:
+                return None
+
+        return material_list
     
-    def get_material_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
+    def get_products_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
         material_list: List[float] = []
 
         for material in input_material_frames.values():
@@ -103,14 +122,16 @@ class MaterialColumn(Frame):
 
     def __init__(self, parent: Tk, material: str, id: str) -> None:
         super(MaterialColumn, self).__init__(master=parent)
-        label = Label(master=self, text=f"{material}-{id}")
+        self.material = material
+        label = Label(master=self, text=f"{self.material}-{id}")
         label.grid(row=0, column=0, columnspan=3)
 
         self.create_column()
 
     def create_column(self) -> None:
         self.len_column()
-        self.amt_column()
+        if self.material == "Product":
+            self.amt_column()
     
     def len_column(self) -> None:
         label_len = Label(master=self, text="Length")
