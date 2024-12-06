@@ -8,7 +8,7 @@ def assortment_calc(chromosome: Dict[str, List[int]|List[float]],
                     len_product_list: List[float],
                     len_stock_list: List[float])-> Dict[str, List[float]|List[int]|List[List[int]]]:
     """
-    Generate cutting patterns
+    Generate cutting patterns for each chromosome
     """
     gene_b: List[int] = chromosome['gene_b'].copy()
     gene_p: List[float] = chromosome['gene_p'].copy()
