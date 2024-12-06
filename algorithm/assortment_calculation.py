@@ -13,8 +13,8 @@ def assortment_calc(chromosome: Dict[str, List[int]|List[float]],
     gene_b: List[int] = chromosome['gene_b'].copy()
     gene_p: List[float] = chromosome['gene_p'].copy()
     
-    patterns: List[List[List[int]]] = [[[]] for i in range(len(len_stock_list))]
-    num_used_stock: List[int] = [0 for i in range(len(len_stock_list))]
+    patterns: List[List[List[int]]] = [[[]] for _ in range(len(len_stock_list))]
+    num_used_stock: List[int] = [0 for _ in range(len(len_stock_list))]
 
     curr_assigned_stock: int = gene_b[0]
 
