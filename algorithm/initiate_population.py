@@ -6,7 +6,8 @@ from typing import Dict
 from utils.const import NUM_POPULATION
 
 
-def initiate_population(len_stock_list: List[float], len_product_list: List[float]) -> List[Dict[str, List[int]|List[float]]]:
+def initiate_population(len_stock_list: List[float],
+                        len_product_list: List[float]) -> List[Dict[str, List[int]|List[float]]]:
     population: List[Dict[str, List[float]|List[int]]] = []
     for i in range(NUM_POPULATION):
         gene_b: List[int]  = initiate_gene_b(len_stock_list, len_product_list)
