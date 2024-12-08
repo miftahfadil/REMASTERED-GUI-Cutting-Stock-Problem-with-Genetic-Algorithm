@@ -3,13 +3,13 @@ from random import random
 from typing import List
 from typing import Dict
 
-from utils.const import NUM_POPULATION
+from utils.const import NUM_CHROM_IN_POPULATION
 
 
 def initiate_population(len_stock_list: List[float],
                         len_product_list: List[float]) -> List[Dict[str, List[int]|List[float]]]:
     population: List[Dict[str, List[float]|List[int]]] = []
-    for i in range(NUM_POPULATION):
+    for i in range(NUM_CHROM_IN_POPULATION):
         gene_b: List[int]  = initiate_gene_b(len_stock_list, len_product_list)
         gene_p: List[float] = [random() for j in range(len(gene_b))]
         chromosome = {

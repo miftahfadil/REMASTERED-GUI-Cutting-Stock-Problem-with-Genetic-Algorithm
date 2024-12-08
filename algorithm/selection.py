@@ -3,7 +3,7 @@ from typing import List
 from typing import Any
 from random import random 
 
-from utils.const import NUM_POPULATION
+from utils.const import NUM_CHROM_IN_POPULATION
 
 
 def selection(
@@ -37,7 +37,7 @@ def roulette_wheel_selection(
     population: List[Dict[str, List[float]|List[int]|Any]]
 ) -> List[Dict[str, List[float]|List[int]|Any]]:
     """
-    Select (NUM_POPULATION - 3) chromosomes
+    Select (NUM_CHROM_IN_POPULATION - 3) chromosomes
     """
     fitness_total: float = sum([chromosome["fitness"] for chromosome in population])
 
@@ -51,7 +51,7 @@ def roulette_wheel_selection(
 
     selected_chromosomes: List[Dict[str, List[float]|List[int]|Any]] = []
 
-    for _ in range(NUM_POPULATION - 3):
+    for _ in range(NUM_CHROM_IN_POPULATION - 3):
 
         rand: float = random()
 
