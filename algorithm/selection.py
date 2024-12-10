@@ -3,6 +3,8 @@ from typing import List
 from typing import Any
 from random import random 
 
+from .fitness import best_fit_chromosome
+
 from utils.const import NUM_CHROM_IN_POPULATION
 
 
@@ -14,24 +16,13 @@ def selection(
     """
     selected_chromosome: List[Dict[str, List[float]|List[int]|Any]] = []
 
-    elitist: Dict[str, List[float]|List[int]|Any] = elitism_selection(population)
+    elitist: Dict[str, List[float]|List[int]|Any] = best_fit_chromosome(population)
     selected_chromosome.append(elitist)
 
-    rouletted: Dict[str, List[float]|List[int]|Any] = roulette_wheel_selection(population)
-    selected_chromosome.append(rouletted)
+    rouletted: List[Dict[str, List[float]|List[int]|Any]] = roulette_wheel_selection(population)
+    selected_chromosome += rouletted
 
     return selected_chromosome
-
-def elitism_selection(
-    population: List[Dict[str, List[float]|List[int]|Any]]
-) -> Dict[str, List[float]|List[int]|Any]:
-    """
-    Select a chromosom with highest fitness
-    """
-    sorted_population = sorted(population,
-                               key=lambda chromosome: chromosome['fitness'],
-                               reverse=True)
-    return sorted_population[0]
 
 def roulette_wheel_selection(
     population: List[Dict[str, List[float]|List[int]|Any]]
@@ -60,6 +51,7 @@ def roulette_wheel_selection(
             if rand <= cumulative_prob:
                 
                 selected_chromosomes.append(population[idx])
+
                 break
 
     return selected_chromosomes

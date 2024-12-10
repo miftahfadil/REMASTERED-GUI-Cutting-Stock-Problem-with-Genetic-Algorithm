@@ -1,9 +1,10 @@
 from typing import Dict
 from typing import List
+from typing import Any
 
 
 def snipping_rate(
-    assorted_chromosome: Dict[str, List[float]|List[int]|List[List[int]]],
+    assorted_chromosome: Dict[str, List[float]|List[int]|Any],
     len_stock_list: List[float]
 ) -> List[float]:
     """
@@ -17,13 +18,12 @@ def snipping_rate(
 
     for i in range(len(len_stock_list)):
 
-        flattened_sum:float = round(sum(flatten_patterns[i]), 1)
+        flattened_sum: float = round(sum(flatten_patterns[i]), 1)
 
-        if num_used_stock[i] >= 1:
-            used_stock_length: float  = (num_used_stock[i] * len_stock_list[i])
+        if num_used_stock[i] > 0:
+            used_stock_length: float = (num_used_stock[i] * len_stock_list[i])
             
         else:
-            flattened_sum = round(sum(flatten_patterns[i]), 1)
             used_stock_length: float = len_stock_list[i]
         
         snip_rate.append(1 - (flattened_sum/used_stock_length))
@@ -31,9 +31,9 @@ def snipping_rate(
     return snip_rate
         
 def revise_gene_p(
-    assorted_chromosome: Dict[str, List[float]|List[int]|List[List[int]]],
+    assorted_chromosome: Dict[str, List[float]|List[int]|Any],
     len_stock_list: List[float]
-) -> Dict[str, List[float]|List[int]|List[List[int]]]:
+) -> Dict[str, List[float]|List[int]|Any]:
     """
     Revise gene p by snipping rate
     """

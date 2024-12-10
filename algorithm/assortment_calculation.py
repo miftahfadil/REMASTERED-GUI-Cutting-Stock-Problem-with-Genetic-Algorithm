@@ -1,12 +1,13 @@
 from typing import Dict
 from typing import List
+from typing import Any
 
-from numpy import array
+from .fitness import fitness
 
 
 def assortment_calc(chromosome: Dict[str, List[int]|List[float]],
-                    len_product_list: List[float],
-                    len_stock_list: List[float])-> Dict[str, List[float]|List[int]|List[List[int]]]:
+                    len_stock_list: List[float],
+                    len_product_list: List[float])-> Dict[str, List[float]|List[int]|Any]:
     """
     Generate cutting patterns for each chromosome
     """
@@ -40,17 +41,21 @@ def assortment_calc(chromosome: Dict[str, List[int]|List[float]],
         
         if not assigned:
             
-            pattern[curr_assigned_stock].append([len_product_list[i]])
-            patterns[gene_b] += 1
+            patterns[curr_assigned_stock].append([len_product_list[i]])
+            num_used_stock[gene_b[i]] += 1
+
+        else:
+
+            continue
     
     flatten: List[List[int]] = flatten_patterns(patterns)
 
-    assorted_chromosome: Dict[str, List[float]|List[int]|List[List[int]]] = {
+    assorted_chromosome: Dict[str, List[float]|List[int]|Any] = {
         "gene_b" : gene_b,
         "gene_p" : gene_p,
-        "patterns": patterns,
-        "flatten": flatten,
-        "num_used_stock": num_used_stock
+        "patterns" : patterns.copy(),
+        "flatten" : flatten.copy(),
+        "num_used_stock" : num_used_stock.copy()
     }
 
     return assorted_chromosome
@@ -59,7 +64,34 @@ def flatten_patterns(patterns: List[List[List[int]]]) -> List[List[int]]:
     """
     flatten patterns based on assigned stock
     """
-    return [array(pattern).flatten().tolist() for pattern in patterns]
+    flatten = []
+    for i in range(len(patterns)):
+        b = []
+        for j in range(len(patterns[i])):
+            for k in range(len(patterns[i][j])):
+                a = patterns[i][j][k]
+                b.append(a)
+        flatten.append(b)
+    return flatten
+
+def population_assortment(population: Dict[str, List[float]|List[int]|Any],
+                        len_stock_list: List[float],
+                        len_product_list: List[float]) -> List[Dict[str, List[float]|List[int]|Any]]:
+    assorted_population: List[Dict[str, List[float]|List[int]|Any]] = []
+
+    for chromosome in population:
+
+            assorted_chromosome: Dict[str, List[int]|List[float]|Any] = assortment_calc(chromosome,
+                                                                                        len_stock_list,
+                                                                                        len_product_list)
+            
+            assorted_chromosome["fitness"] = fitness(num_used_stock=assorted_chromosome["num_used_stock"],
+                                                     len_stock_list=len_stock_list,
+                                                     len_product_list=len_product_list)
+            
+            assorted_population.append(assorted_chromosome)
+
+    return assorted_population
 
 
 if __name__ == "__main__":
