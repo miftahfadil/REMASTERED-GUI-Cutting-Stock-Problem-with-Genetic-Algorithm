@@ -2,6 +2,7 @@ from typing import List
 from typing import Dict
 from random import sample
 from random import random
+from random import randint
 
 from utils.const import NUM_CHROM_IN_POPULATION
 
@@ -10,6 +11,7 @@ def initiate_population(len_stock_list: List[float],
                         len_product_list: List[float]) -> List[Dict[str, List[int]|List[float]]]:
     population: List[Dict[str, List[float]|List[int]]] = []
     for _ in range(NUM_CHROM_IN_POPULATION):
+
         gene_b: List[int]  = initiate_gene_b(len_stock_list, len_product_list)
         gene_p: List[float] = [random() for __ in range(len(gene_b))]
         chromosome = {
@@ -22,6 +24,7 @@ def initiate_population(len_stock_list: List[float],
 
 def initiate_gene_b(len_stock_list: List[float], len_product_list: List[float]) -> List[int]:
     gene_b: List[int] = []
+
     for product in len_product_list:
         feasible_stock = get_feasible_stock(len_stock_list, product)
         idx_stock = sample(population=feasible_stock, k=1)[0]
@@ -31,6 +34,7 @@ def initiate_gene_b(len_stock_list: List[float], len_product_list: List[float]) 
 
 def get_feasible_stock(len_stock_list: List[float], len_product: float) -> List[int]:
     feasible_stock: List[int] = []
+    
     for len_stock in len_stock_list:
         if len_stock >= len_product:
             idx_stock = len_stock_list.index(len_stock)

@@ -51,8 +51,8 @@ def assortment_calc(chromosome: Dict[str, List[int]|List[float]],
     flatten: List[List[int]] = flatten_patterns(patterns)
 
     assorted_chromosome: Dict[str, List[float]|List[int]|Any] = {
-        "gene_b" : gene_b,
-        "gene_p" : gene_p,
+        "gene_b" : gene_b.copy(),
+        "gene_p" : gene_p.copy(),
         "patterns" : patterns.copy(),
         "flatten" : flatten.copy(),
         "num_used_stock" : num_used_stock.copy()

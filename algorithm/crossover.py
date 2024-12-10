@@ -12,7 +12,7 @@ def crossover(selected_chromosome: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     for i, parent in enumerate(parents):
         gene_b_child: List[int] = parent["gene_b"].copy()
         gene_p_child: List[float] = parent["gene_p"].copy()
-        snip_rates: List[float]= parent["snip_rates"]
+        snip_rates: List[float]= parent["snip_rates"].copy()
 
         for j, assigned in enumerate(gene_b_child):
             snip_rate: float = snip_rates[assigned]
@@ -26,8 +26,8 @@ def crossover(selected_chromosome: List[Dict[str, Any]]) -> List[Dict[str, Any]]
         
         childs.append(
             {
-                "gene_b" : gene_b_child,
-                "gene_p" : gene_p_child
+                "gene_b" : gene_b_child.copy(),
+                "gene_p" : gene_p_child.copy()
             }
         )
     

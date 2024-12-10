@@ -37,15 +37,17 @@ def revise_gene_p(
     """
     Revise gene p by snipping rate
     """
-    gene_b: List[int] = assorted_chromosome["gene_b"]
-    gene_p: List[float] = assorted_chromosome["gene_p"]
+    gene_b: List[int] = assorted_chromosome["gene_b"].copy()
+    gene_p: List[float] = assorted_chromosome["gene_p"].copy()
     
     snip_rate: List[float] = snipping_rate(assorted_chromosome, len_stock_list)
 
     for i in range(len(gene_p)):
         gene_p[i] = snip_rate[gene_b[i]]
 
-    assorted_chromosome["snip_rate"] = snip_rate
+    assorted_chromosome["gene_b"] = gene_b.copy()
+    assorted_chromosome["gene_p"] = gene_p.copy()
+    assorted_chromosome["snip_rate"] = snip_rate.copy()
 
     return assorted_chromosome
 

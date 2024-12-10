@@ -25,11 +25,11 @@ def mutation(population: List[Dict[str, Any]], len_stock_list: List[float],
         gene_p: List[int] = chromosome["gene_p"]
 
         for __ in range(num_gene_b_loc):
-            idx_locus: int = randint(0, len(gene_b)-1)
-            gene_b[idx_locus] = randint(0, len(len_stock_list)-1)
+            idx_locus: int = randint(0, len(gene_b) - 1)
+            gene_b[idx_locus] = randint(0, len(len_stock_list) - 1)
             
             while len_stock_list[gene_b[idx_locus]] < len_product_list[idx_locus]:
-                gene_b[idx_locus] = randint(0, len(len_stock_list)-1)
+                gene_b[idx_locus] = randint(0, len(len_stock_list) - 1)
             
             gene_p[idx_locus] = random()
     
@@ -41,7 +41,7 @@ def mutation(population: List[Dict[str, Any]], len_stock_list: List[float],
         gene_p: List[float] = chromosome["gene_p"]
 
         for __ in range(num_gene_p_loc):
-            idx_locus: int = randint(0, len(gene_p)-1)
+            idx_locus: int = randint(0, len(gene_p) - 1)
             gene_p[idx_locus] = random()
 
     return population

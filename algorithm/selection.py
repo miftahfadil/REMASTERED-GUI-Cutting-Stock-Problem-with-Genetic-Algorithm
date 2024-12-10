@@ -43,15 +43,11 @@ def roulette_wheel_selection(
     selected_chromosomes: List[Dict[str, List[float]|List[int]|Any]] = []
 
     for _ in range(NUM_CHROM_IN_POPULATION - 3):
-
         rand: float = random()
 
         for idx, cumulative_prob in enumerate(cumulative_probs):
-
             if rand <= cumulative_prob:
-                
                 selected_chromosomes.append(population[idx])
-
                 break
 
     return selected_chromosomes
