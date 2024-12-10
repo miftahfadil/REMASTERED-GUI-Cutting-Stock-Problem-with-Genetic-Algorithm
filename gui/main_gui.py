@@ -1,7 +1,9 @@
 from tkinter import *
 from typing import Dict
+from typing import List
+from typing import Tuple
 
-from initiate_stocks_products import InitiateStockProduct
+from .initiate_stocks_products import InitiateStockProduct
 
 
 class MainWindow(Tk):
@@ -9,7 +11,7 @@ class MainWindow(Tk):
     def __init__(self, *args, **kwargs) -> None:
         super(MainWindow, self).__init__(*args, **kwargs)
 
-        self.title(string="AppName")
+        self.title(string="Wasteless Cut")
         self._width = 1000
         self._height = 500
         self._frames: Dict[str, Frame] = {}

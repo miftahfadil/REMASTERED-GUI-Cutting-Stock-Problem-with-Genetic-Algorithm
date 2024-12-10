@@ -1,9 +1,10 @@
 from tkinter import *
 from typing import Dict
 from typing import List
+from typing import Tuple
 
-from buttons import DeleteAddColumn
-from pattern_result import PatternResult
+from .buttons import DeleteAddColumn
+from .pattern_result import PatternResult
 
 
 class InitiateStockProduct(Frame):
@@ -25,10 +26,8 @@ class InitiateStockProduct(Frame):
         self.button_generate.grid(row=1, column=0, columnspan=2)
     
     def get_stocks_products_input(self) -> None:
-        self.stocks_list: List[float] = self.get_stocks_input(self.input_stocks.input_material_frames)
-        self.products_list: List[float] = self.get_products_input(self.input_products.input_material_frames)
-        print(self.stocks_list)
-        print(self.products_list)
+        self.master.stocks = self.get_stocks_input(self.input_stocks.input_material_frames)
+        self.master.products = self.get_products_input(self.input_products.input_material_frames)
         self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult)
 
     def get_stocks_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
@@ -42,15 +41,17 @@ class InitiateStockProduct(Frame):
             
             len_material = float(len_material)
 
-            if (len_material > 0 and len_material <= 5000):
+            if (len_material > 0 and len_material <= 10000):
                 material_list.append(len_material)
             else:
                 return None
 
         return material_list
     
-    def get_products_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
+    def get_products_input(self, input_material_frames: Dict[int, Frame]) -> Tuple[List[float]|List[int]]|None:
         material_list: List[float] = []
+        material_lengths: List[float] = []
+        material_amounts: List[int] = []
 
         for material in input_material_frames.values():
             len_material = material.entry_len.get()
@@ -62,13 +63,17 @@ class InitiateStockProduct(Frame):
             len_material = float(len_material)
             amt_material = int(amt_material)
 
-            if (len_material > 0 and len_material <= 5000) and (amt_material > 0 and amt_material <= 2000):
+            if (len_material > 0 and len_material <= 10000) and (amt_material > 0 and amt_material <= 200):
                 cur_material = [len_material] * amt_material
                 material_list += cur_material
+
+                material_lengths.append(len_material)
+                material_amounts.append(amt_material)
+
             else:
                 return None
 
-        return material_list
+        return material_lengths, material_amounts, material_list
         
 class InputFrame(Frame):
     
@@ -156,7 +161,7 @@ class MaterialColumn(Frame):
         label_pcs = Label(master=self, text="pcs")
         label_pcs.grid(row=1, column=5)
 
-        label_max_len = Label(master=self, text="Maximum 2000 pcs")
+        label_max_len = Label(master=self, text="Maximum 200 pcs")
         label_max_len.grid(row=2, column=3, columnspan=3)
 
 
