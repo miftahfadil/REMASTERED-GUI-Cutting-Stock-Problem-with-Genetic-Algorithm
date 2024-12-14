@@ -12,14 +12,17 @@ class InitiateStockProduct(Frame):
     def __init__(self, parent: Tk) -> None:
         super(InitiateStockProduct, self).__init__(master=parent)
 
+        self.rowconfigure((0), weight=1)
+        self.columnconfigure((0), weight=1)
+
         self.create_gui()
 
     def create_gui(self) -> None:
-        self.input_stocks = InputFrame(parent=self, material="Stock")
-        self.input_stocks.grid(row=0, column=0, padx=10)
+        self.input_stocks = InputFrame(parent=self, material="Stock", bg="red")
+        self.input_stocks.grid(row=0, column=0, padx=10, sticky=NSEW)
 
         self.input_products = InputFrame(parent=self, material="Product")
-        self.input_products.grid(row=0, column=1, padx=10)
+        self.input_products.grid(row=0, column=1, padx=10, sticky=NSEW)
 
         self.button_generate = Button(master=self, text="Generate Cutting Pattern",
                                  command=self.get_stocks_products_input)
@@ -77,8 +80,8 @@ class InitiateStockProduct(Frame):
         
 class InputFrame(Frame):
     
-    def __init__(self, parent: Tk, material: str) -> None:
-        super(InputFrame, self).__init__(master=parent, width=400, height=500)
+    def __init__(self, parent: Tk, material: str, **kwargs) -> None:
+        super(InputFrame, self).__init__(master=parent, width=400, height=500, **kwargs)
         
         self.input_material_frames: Dict[int, Frame] = {}
         self.material = material
@@ -97,8 +100,7 @@ class InputFrame(Frame):
     def create_scrollable(self) -> None:
         self.scroll = Scrollbar(self, orient=VERTICAL)
         self.scroll.grid(row=0, column=1, sticky='NSW')
-        self.canvas = Canvas(self, width=500, height=300, 
-                            yscrollcommand=self.scroll.set, highlightthickness=0)
+        self.canvas = Canvas(self, yscrollcommand=self.scroll.set, highlightthickness=0)
         self.canvas.grid(row=0, column=0, pady=12, padx=12, sticky=NSEW)
         self.scroll.config(command=self.canvas.yview)
         self.frame = Frame(self.canvas)

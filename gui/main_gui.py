@@ -39,6 +39,9 @@ class MainWindow(Tk):
         self._frames[name_frame] = new_frame(parent=self)
         self._frames[name_frame].pack(expand=TRUE)
 
+    
+
+
 
 if __name__ == "__main__":
     main_app = MainWindow()

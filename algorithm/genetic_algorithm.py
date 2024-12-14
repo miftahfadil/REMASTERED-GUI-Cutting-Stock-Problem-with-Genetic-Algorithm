@@ -57,6 +57,8 @@ def genetic_algorithm(
 
         gen_counter += 1
 
+    best_chromosome["len_stocks_list"] = len_stock_list.copy()
+
     return best_chromosome
 
 if __name__ == "__main__":
