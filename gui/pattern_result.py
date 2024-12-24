@@ -25,7 +25,7 @@ class PatternResult(Frame):
     def create_gui(self) -> None:
         Label(master=self, text="Pattern Result").pack(fill=X)
 
-        pattern_plot = PatternPlot(parent=self, bg="blue")
+        pattern_plot = PatternPlot(parent=self)
         pattern_plot.pack(fill=BOTH, expand=1)
 
         self.button_back = Button(master=self, text="Back",
@@ -45,9 +45,10 @@ class PatternPlot(Frame):
 
         self.create_scrollable()
         self.display_plot()
+        self.display_stat()
 
     def create_scrollable(self) -> None:
-        self.canvas = Canvas(master=self)
+        self.canvas = Canvas(master=self, height=400, width=700)
         self.canvas.grid(row=0, column=0, sticky=NSEW)
 
         y_scrollbar = ttk.Scrollbar(master=self, orient=VERTICAL, command=self.canvas.yview)
@@ -71,14 +72,16 @@ class PatternPlot(Frame):
         canvas_plot = FigureCanvasTkAgg(fig, master=self.inner_canvas)
         canvas_plot.draw()
         widget = canvas_plot.get_tk_widget()
-        widget.pack(side=TOP, fill=BOTH, expand=1, anchor=NW, padx=10, pady=10)
+        widget.pack(fill=BOTH, anchor=N)
 
     def create_cutting_pattern(self) -> Figure:
-        fig, ax = plt.subplots(figsize=(10, 6))
+        total_pattern: int = sum(self.num_used_stock)
+        col_size: int = max(4, total_pattern * 2)
+        fig, ax = plt.subplots(figsize=(7, col_size))
 
         y_offset: float = 0.
-        width: float = .3
-        margin: float = .1
+        width: float = 1.
+        margin: float = .5
         for idx_stock, patterns_by_stock in enumerate(self.patterns):
             len_stock: float = self.stocks[idx_stock]
 
@@ -97,15 +100,23 @@ class PatternPlot(Frame):
                 
                 y_offset += (width + margin)
         
-        ax.set_xlim(-margin, max(self.stocks) + 1)
-        ax.set_ylim(-margin, sum(self.num_used_stock) * (width + margin) + 1)
-        ax.set_xlabel("Length")
-        ax.set_title("Cutting Pattern Representation")
-        ax.set_aspect('equal')
+        x_bound: float = margin * .01
+        y_bound: float = margin * 10
+        ax.set_xlim(-x_bound, max(self.stocks) + x_bound)
+        ax.set_ylim(-y_bound, y_offset)
+        ax.set_title("Cutting Pattern Plot")
+        # ax.set_aspect('equal')
         ax.axis('off')
+
+        fig.tight_layout(pad = 2)
 
         return fig
 
+    def display_stat(self) -> None:
+        self.stat_frame = Frame(master=self)
+        self.stat_frame.grid(row=0, column=2, rowspan=2)
+
+        Label(master=self.stat_frame, text="Pattern Stat").pack()
 
 if __name__ == "__main__":
     main = Tk()

@@ -18,7 +18,7 @@ class InitiateStockProduct(Frame):
         self.create_gui()
 
     def create_gui(self) -> None:
-        self.input_stocks = InputFrame(parent=self, material="Stock", bg="red")
+        self.input_stocks = InputFrame(parent=self, material="Stock")
         self.input_stocks.grid(row=0, column=0, padx=10, sticky=NSEW)
 
         self.input_products = InputFrame(parent=self, material="Product")
