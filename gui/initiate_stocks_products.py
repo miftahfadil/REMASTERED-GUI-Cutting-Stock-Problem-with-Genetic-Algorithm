@@ -3,14 +3,20 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 
-from .buttons import DeleteAddColumn
+from utils.theme import Colors
+from utils.theme import Fonts
+from utils.validate import validate_entry_len
+from utils.validate import validate_entry_amt
+from .widgets import ButtonThemed
+from .widgets import DeleteAddColumn
+from .widgets import EntryThemed
 from .pattern_result import PatternResult
 
 
 class InitiateStockProduct(Frame):
 
     def __init__(self, parent: Tk) -> None:
-        super(InitiateStockProduct, self).__init__(master=parent)
+        super(InitiateStockProduct, self).__init__(master=parent, bg=Colors.white)
 
         self.rowconfigure((0), weight=1)
         self.columnconfigure((0), weight=1)
@@ -18,15 +24,18 @@ class InitiateStockProduct(Frame):
         self.create_gui()
 
     def create_gui(self) -> None:
+        Label(master=self, text="Input Stock and Product Data", font=Fonts.h1,
+              bg=Colors.white, fg=Colors.green2).grid(row=0, column=0, columnspan=2, pady=(4, 28))
+
         self.input_stocks = InputFrame(parent=self, material="Stock")
-        self.input_stocks.grid(row=0, column=0, padx=10, sticky=NSEW)
+        self.input_stocks.grid(row=1, column=0, padx=10, sticky=NSEW)
 
         self.input_products = InputFrame(parent=self, material="Product")
-        self.input_products.grid(row=0, column=1, padx=10, sticky=NSEW)
+        self.input_products.grid(row=1, column=1, padx=10, sticky=NSEW)
 
-        self.button_generate = Button(master=self, text="Generate Cutting Pattern",
-                                 command=self.get_stocks_products_input)
-        self.button_generate.grid(row=1, column=0, columnspan=2)
+        self.button_generate = ButtonThemed(parent=self, text="Generate Cutting Pattern", bg=Colors.yellow1,
+                                fg=Colors.white, command=self.get_stocks_products_input, width=30)
+        self.button_generate.grid(row=2, column=0, columnspan=2, pady=24)
     
     def get_stocks_products_input(self) -> None:
         self.master.stocks = self.get_stocks_input(self.input_stocks.input_material_frames)
@@ -80,8 +89,8 @@ class InitiateStockProduct(Frame):
         
 class InputFrame(Frame):
     
-    def __init__(self, parent: Tk, material: str, **kwargs) -> None:
-        super(InputFrame, self).__init__(master=parent, width=400, height=500, **kwargs)
+    def __init__(self, parent: Tk, material: str, bg: str = Colors.white, **kwargs) -> None:
+        super(InputFrame, self).__init__(master=parent, bg=bg, **kwargs)
         
         self.input_material_frames: Dict[int, Frame] = {}
         self.material = material
@@ -100,10 +109,10 @@ class InputFrame(Frame):
     def create_scrollable(self) -> None:
         self.scroll = Scrollbar(self, orient=VERTICAL)
         self.scroll.grid(row=0, column=1, sticky='NSW')
-        self.canvas = Canvas(self, yscrollcommand=self.scroll.set, highlightthickness=0)
+        self.canvas = Canvas(self, bg=Colors.white, height=400, yscrollcommand=self.scroll.set, highlightthickness=0)
         self.canvas.grid(row=0, column=0, pady=12, padx=12, sticky=NSEW)
         self.scroll.config(command=self.canvas.yview)
-        self.frame = Frame(self.canvas)
+        self.frame = Frame(self.canvas, bg=self["bg"])
 
         self.frame.bind('<Configure>', self._configure_frame)
         self.canvas.bind('<Configure>', self._configure_canvas)
@@ -127,11 +136,12 @@ class InputFrame(Frame):
 
 class MaterialColumn(Frame):
 
-    def __init__(self, parent: Tk, material: str, id: str) -> None:
-        super(MaterialColumn, self).__init__(master=parent)
+    def __init__(self, parent: Tk, material: str, id: str, bg:str = Colors.white) -> None:
+        super(MaterialColumn, self).__init__(master=parent, bg=bg)
         self.material = material
-        label = Label(master=self, text=f"{self.material}-{id}")
-        label.grid(row=0, column=0, columnspan=3)
+        label = Label(master=self, text=f"{self.material}-{id}",
+                      font=Fonts.h5, bg=Colors.white, fg=Colors.black)
+        label.grid(row=0, column=0, columnspan=5, pady=(4, 0))
 
         self.create_column()
 
@@ -141,30 +151,26 @@ class MaterialColumn(Frame):
             self.amt_column()
     
     def len_column(self) -> None:
-        label_len = Label(master=self, text="Length")
-        label_len.grid(row=1, column=0)
+        label_len = Label(master=self, text="Length",
+                          font=Fonts.p3, bg=Colors.white, fg=Colors.black)
+        label_len.grid(row=1, column=0, padx=4, pady=4)
 
-        self.entry_len = Entry(master=self)
-        self.entry_len.grid(row=1, column=1)
-
-        label_cm = Label(master=self, text="cm")
-        label_cm.grid(row=1, column=2)
-
-        label_max_len = Label(master=self, text="Maximum 5000 cm (50 m)")
-        label_max_len.grid(row=2, column=0, columnspan=3)
+        self.entry_len = EntryThemed(parent=self, placeholder="Enter length here",
+                                     command=validate_entry_len, font=Fonts.p3)
+        self.entry_len.grid(row=1, column=1, padx=4, pady=4)
         
     def amt_column(self) -> None:    
-        label_amt = Label(master=self, text="Amount")
-        label_amt.grid(row=1, column=3)
+        label_amt = Label(master=self, text="Amount",
+                          font=Fonts.p3, bg=Colors.white, fg=Colors.black)
+        label_amt.grid(row=1, column=2, padx=4, pady=4)
 
-        self.entry_amt = Entry(master=self)
-        self.entry_amt.grid(row=1, column=4)
+        self.entry_amt = EntryThemed(parent=self, placeholder="Enter amount here",
+                                     command=validate_entry_amt, font=Fonts.p3)
+        self.entry_amt.grid(row=1, column=3, padx=4, pady=4)
 
-        label_pcs = Label(master=self, text="pcs")
-        label_pcs.grid(row=1, column=5)
-
-        label_max_len = Label(master=self, text="Maximum 200 pcs")
-        label_max_len.grid(row=2, column=3, columnspan=3)
+        label_pcs = Label(master=self, text="pcs",
+                          font=Fonts.p3, bg=Colors.white, fg=Colors.black)
+        label_pcs.grid(row=1, column=4, padx=4, pady=4)
 
 
 if __name__ == "__main__":

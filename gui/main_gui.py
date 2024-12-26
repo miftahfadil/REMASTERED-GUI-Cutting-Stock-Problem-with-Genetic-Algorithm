@@ -3,6 +3,7 @@ from typing import Dict
 from typing import List
 from typing import Tuple
 
+from utils.theme import Colors
 from .initiate_stocks_products import InitiateStockProduct
 
 
@@ -12,8 +13,9 @@ class MainWindow(Tk):
         super(MainWindow, self).__init__(*args, **kwargs)
 
         self.title(string="Wasteless Cut")
+        self.configure(bg=Colors.white)
         self._width = 1000
-        self._height = 500
+        self._height = 700
         self._frames: Dict[str, Frame] = {}
 
         self.resizable(width=False, height=False)
