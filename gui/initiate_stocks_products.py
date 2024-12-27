@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import colorchooser
 from typing import Dict
 from typing import List
 from typing import Tuple
@@ -44,6 +45,7 @@ class InitiateStockProduct(Frame):
 
     def get_stocks_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
         material_list: List[float] = []
+        color_list: List[str] = []
 
         for material in input_material_frames.values():
             len_material = material.entry_len.get()
@@ -55,15 +57,17 @@ class InitiateStockProduct(Frame):
 
             if (len_material > 0 and len_material <= 10000):
                 material_list.append(len_material)
+                color_list.append(material.color["bg"])
             else:
                 return None
 
-        return material_list
+        return material_list, color_list
     
     def get_products_input(self, input_material_frames: Dict[int, Frame]) -> Tuple[List[float]|List[int]]|None:
         material_list: List[float] = []
         material_lengths: List[float] = []
         material_amounts: List[int] = []
+        color_list: List[str] = []
 
         for material in input_material_frames.values():
             len_material = material.entry_len.get()
@@ -75,21 +79,23 @@ class InitiateStockProduct(Frame):
             len_material = float(len_material)
             amt_material = int(amt_material)
 
-            if (len_material > 0 and len_material <= 10000) and (amt_material > 0 and amt_material <= 200):
+            if (len_material > 0 and len_material <= 10000) and (amt_material > 0 and amt_material <= 1000):
                 cur_material = [len_material] * amt_material
                 material_list += cur_material
 
                 material_lengths.append(len_material)
                 material_amounts.append(amt_material)
+                color_list.append(material.color["bg"])
 
             else:
                 return None
-
-        return material_lengths, material_amounts, material_list
+    
+        return material_lengths, material_amounts, material_list, color_list
+    
         
 class InputFrame(Frame):
     
-    def __init__(self, parent: Tk, material: str, bg: str = Colors.white, **kwargs) -> None:
+    def __init__(self, parent: Widget, material: str, bg: str = Colors.white, **kwargs) -> None:
         super(InputFrame, self).__init__(master=parent, bg=bg, **kwargs)
         
         self.input_material_frames: Dict[int, Frame] = {}
@@ -101,7 +107,7 @@ class InputFrame(Frame):
         self.create_scrollable()
 
         self.input_material_frames[1] = MaterialColumn(parent=self.frame, material=self.material, id=1)
-        self.input_material_frames[1].pack()
+        self.input_material_frames[1].pack(padx=4, pady=2)
 
         self.button_del_add = DeleteAddColumn(parent=self, column_frame=MaterialColumn)
         self.button_del_add.grid(row=1, column=0)
@@ -136,41 +142,48 @@ class InputFrame(Frame):
 
 class MaterialColumn(Frame):
 
-    def __init__(self, parent: Tk, material: str, id: str, bg:str = Colors.white) -> None:
+    def __init__(self, parent: Widget, material: str, id: str, bg:str = Colors.white) -> None:
         super(MaterialColumn, self).__init__(master=parent, bg=bg)
         self.material = material
         label = Label(master=self, text=f"{self.material}-{id}",
                       font=Fonts.h5, bg=Colors.white, fg=Colors.black)
-        label.grid(row=0, column=0, columnspan=5, pady=(4, 0))
+        label.grid(row=0, column=0, padx=4, pady=(4, 2), sticky=W)
+
+        self.color = Button(master=self, bg="#CFCFCF", font=Fonts.p3, relief=FLAT,
+                           width=2, command=self.change_color_label)
+        self.color.grid(row=0, column=1, padx=4, pady=2, sticky=W)
 
         self.create_column()
 
     def create_column(self) -> None:
         self.len_column()
         if self.material == "Product":
+            self.color["bg"] = "#87ceeb"
             self.amt_column()
     
     def len_column(self) -> None:
-        label_len = Label(master=self, text="Length",
-                          font=Fonts.p3, bg=Colors.white, fg=Colors.black)
-        label_len.grid(row=1, column=0, padx=4, pady=4)
+        Label(master=self, text="Length",
+            font=Fonts.p3, bg=Colors.white, fg=Colors.black).grid(row=1, column=0, padx=4, pady=4, sticky=W)
 
         self.entry_len = EntryThemed(parent=self, placeholder="Enter length here",
                                      command=validate_entry_len, font=Fonts.p3)
         self.entry_len.grid(row=1, column=1, padx=4, pady=4)
         
     def amt_column(self) -> None:    
-        label_amt = Label(master=self, text="Amount",
-                          font=Fonts.p3, bg=Colors.white, fg=Colors.black)
-        label_amt.grid(row=1, column=2, padx=4, pady=4)
+        Label(master=self, text="Amount",
+            font=Fonts.p3, bg=Colors.white, fg=Colors.black).grid(row=1, column=2, padx=4, pady=4)
 
         self.entry_amt = EntryThemed(parent=self, placeholder="Enter amount here",
                                      command=validate_entry_amt, font=Fonts.p3)
         self.entry_amt.grid(row=1, column=3, padx=4, pady=4)
 
-        label_pcs = Label(master=self, text="pcs",
-                          font=Fonts.p3, bg=Colors.white, fg=Colors.black)
-        label_pcs.grid(row=1, column=4, padx=4, pady=4)
+        Label(master=self, text="pcs",
+            font=Fonts.p3, bg=Colors.white, fg=Colors.black).grid(row=1, column=4, padx=4, pady=4)
+
+    def change_color_label(self) -> None:
+        choosen_color = colorchooser.askcolor(parent=self, title="Choose Color Label")[1]
+        if choosen_color:
+            self.color["bg"] = choosen_color
 
 
 if __name__ == "__main__":

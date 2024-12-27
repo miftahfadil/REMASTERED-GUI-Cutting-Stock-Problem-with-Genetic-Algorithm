@@ -1,12 +1,12 @@
 from tkinter import *
 from collections.abc import Callable
 from typing import Optional
-from colorsys import rgb_to_hls
-from colorsys import hls_to_rgb
+
 
 
 from utils.theme import Colors
 from utils.theme import Fonts
+from utils.theme import darken_hex_color
 
 
 class ButtonThemed(Button):
@@ -29,7 +29,7 @@ class ButtonThemed(Button):
 
 class DeleteAddColumn(Frame):
         
-    def __init__(self, parent: Tk, column_frame: Frame, bg: str = Colors.white, **kwargs) -> None:
+    def __init__(self, parent: Widget, column_frame: Frame, bg: str = Colors.white, **kwargs) -> None:
         super(DeleteAddColumn, self).__init__(master=parent, bg=bg, **kwargs)
         self.parent = parent
         self.column_frame = column_frame
@@ -103,7 +103,14 @@ class EntryThemed(Entry):
             self.insert(0, self.placeholder)
             self['fg'] = 'grey'
             self.placeholder_active = True
+
         self.configure(highlightbackground=self.border_color)
+
+        if self.command:
+            if self.command(self.get()):
+                self.configure(highlightbackground=self.border_color)
+            else:
+                self.configure(highlightbackground=Colors.red)
 
     def on_key_release(self, event):
         if self.command:
@@ -118,39 +125,10 @@ class EntryThemed(Entry):
     def on_leave(self, event):
         self.configure(highlightbackground=self.border_color)
 
-def darken_hex_color(hex_color: str, reduction: float = 0.2) -> str:
-    """
-    Mengurangi kecerahan (lightness) dari warna heksadesimal.
-    
-    Args:
-        hex_color (str): Warna dalam format heksadesimal (misalnya "#RRGGBB").
-        reduction (float): Proporsi penurunan kecerahan (default: 0.2, yaitu 20%).
-    
-    Returns:
-        str: Warna hasil yang lebih gelap dalam format heksadesimal.
-    """
-    # Validasi input
-    if not (hex_color.startswith("#") and len(hex_color) == 7):
-        raise ValueError("Format warna harus berupa '#RRGGBB'.")
-    
-    # Konversi warna dari heksadesimal ke nilai RGB
-    r = int(hex_color[1:3], 16) / 255.0
-    g = int(hex_color[3:5], 16) / 255.0
-    b = int(hex_color[5:7], 16) / 255.0
+        if self.command:
+            if self.command(self.get()):
+                self.configure(highlightbackground=self.border_color)
+            else:
+                self.configure(highlightbackground=Colors.red)
 
-    # Konversi RGB ke HLS
-    h, l, s = rgb_to_hls(r, g, b)
-
-    # Kurangi kecerahan (lightness)
-    l = max(0, l * (1 - reduction))
-
-    # Konversi kembali dari HLS ke RGB
-    r, g, b = hls_to_rgb(h, l, s)
-
-    # Konversi RGB ke heksadesimal
-    darkened_hex = "#{:02X}{:02X}{:02X}".format(
-        int(r * 255), int(g * 255), int(b * 255)
-    )
-    
-    return darkened_hex
 
