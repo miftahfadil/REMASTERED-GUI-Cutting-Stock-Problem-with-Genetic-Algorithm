@@ -53,7 +53,7 @@ def genetic_algorithm(
         len_stock_used: float = get_len_stock_used(num_used_stock=best_chromosome["num_used_stock"],
                                                    len_stocks_list=len_stock_list)
         yield_rate = yield_rate_calc(len_product_list, len_stock_used)
-        best_chromosome["yield rate"] = yield_rate
+        best_chromosome["yield_rate"] = yield_rate
 
         gen_counter += 1
 

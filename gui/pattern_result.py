@@ -2,9 +2,11 @@ from tkinter import *
 from tkinter import ttk
 from tkinter.filedialog import asksaveasfilename
 from tkinter.messagebox import showinfo
+from tkinter.messagebox import showerror
 from typing import Dict
 from typing import List
 from typing import Any
+import json
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -23,60 +25,56 @@ class PatternResult(Frame):
     def __init__(self, parent: Tk, bg:str = Colors.white, **kwargs) -> None:
         super(PatternResult, self).__init__(master=parent, bg=bg)
 
-        self.raw_data: Dict[str, List[int]|List[float]|Any] = {
-            "len_stocks_list" : self.master.stocks[0],
-            "stock_color_label" : self.master.stocks[1],
-            "len_products" : self.master.products[0],
-            "len_products_list" : self.master.products[2],
-            "product_color_label" : self.master.products[3]
-        }
-        self.metadata: Dict[str, List[int]|List[float]|Any] = genetic_algorithm(len_stock_list=self.raw_data["len_stocks_list"],
-                                                            len_product_list=self.raw_data["len_products_list"])
-        # self.metadata = self.master.metadata
+        self.metadata: Dict[str, List[int]|List[float]|Any] = genetic_algorithm(len_stock_list=self.master.stocks[0],
+                                                            len_product_list=self.master.products[2])
+
+        self.metadata["len_products"] = self.master.products[0].copy()
+        self.metadata["amt_products"] = self.master.products[1].copy()
+        self.metadata["len_products_list"] = self.master.products[2].copy()
+        self.metadata["product_color_label"] = self.master.products[3].copy()
+        self.metadata["stock_color_label"] = self.master.stocks[1].copy()
 
         self.create_gui()
 
     def create_gui(self) -> None:
-        Label(master=self, text="Pattern Result", font=Fonts.h1,
+        self.button_back = ButtonThemed(parent=self, text="Back",
+                                    bg=Colors.yellow1, fg=Colors.white, command=self.master.create_gui)
+        self.button_back.pack(padx=20, pady=12, anchor=W)
+
+        Label(master=self, text="Cutting Pattern Result", font=Fonts.h1,
             bg=Colors.white, fg=Colors.green2).pack(fill=X, pady=(4, 24))
 
         pattern_plot = PatternPlot(parent=self)
-        pattern_plot.pack(fill=BOTH, expand=1)
+        pattern_plot.pack(padx=10, pady=10, fill=BOTH)
 
-        self.button_back = ButtonThemed(parent=self, text="Back to Input Data",
-                                    bg=Colors.yellow1, fg=Colors.white, command=self.master.create_gui)
-        self.button_back.pack(fill=X, pady=(12, 0))
 
 class PatternPlot(Frame):
 
     def __init__(self, parent: Widget, **kwargs) -> None:
-        super(PatternPlot, self).__init__(master=parent, **kwargs)
+        super(PatternPlot, self).__init__(master=parent, bg=Colors.green2, **kwargs)
         self.stocks: List[float] = self.master.metadata["len_stocks_list"].copy()
-        self.products: List[float] = self.master.raw_data["len_products"].copy()
+        self.products: List[float] = self.master.metadata["len_products"].copy()
         self.num_used_stock: List[float] = self.master.metadata["num_used_stock"].copy()
         self.patterns: List[List[List[float]]] = self.master.metadata["patterns"].copy()
 
-        self.color_stock: List[str] = self.master.raw_data["stock_color_label"].copy()
-        self.color_product: List[str] = self.master.raw_data["product_color_label"].copy()
+        self.color_stock: List[str] = self.master.metadata["stock_color_label"].copy()
+        self.color_product: List[str] = self.master.metadata["product_color_label"].copy()
 
-        self.rowconfigure(0, weight=1)
-        self.columnconfigure(0, weight=1)
+        self.grid_rowconfigure((0, 1), weight=1)
+        self.grid_columnconfigure((0, 2), weight=1)
 
         self.create_scrollable()
         self.display_plot()
         self.display_stat()
 
     def create_scrollable(self) -> None:
-        self.canvas = Canvas(master=self, height=500, width=700)
+        self.canvas = Canvas(master=self, height=500, width=800, bg=Colors.white)
         self.canvas.grid(row=0, column=0, sticky=NSEW)
 
         y_scrollbar = ttk.Scrollbar(master=self, orient=VERTICAL, command=self.canvas.yview)
         y_scrollbar.grid(row=0, column=1, sticky=NS)
 
-        x_scrollbar = ttk.Scrollbar(master=self, orient=HORIZONTAL, command=self.canvas.xview)
-        x_scrollbar.grid(row=1, column=0, sticky=EW)
-
-        self.canvas.configure(xscrollcommand=x_scrollbar.set, yscrollcommand=y_scrollbar.set)
+        self.canvas.configure(yscrollcommand=y_scrollbar.set)
 
         self.inner_canvas = ttk.Frame(self.canvas)
         self.canvas.create_window((0,0), window=self.inner_canvas, anchor=NW)
@@ -98,7 +96,7 @@ class PatternPlot(Frame):
         total_pattern: int = sum(self.num_used_stock)
         max_len_stock:int = max(self.stocks)
         col_size: int = max(5, total_pattern * 2)
-        fig, ax = plt.subplots(figsize=(7, col_size))
+        fig, ax = plt.subplots(figsize=(8, col_size))
 
         digit = self.get_num_digits(num=max(self.stocks))
 
@@ -166,27 +164,36 @@ class PatternPlot(Frame):
         return fig
 
     def display_stat(self) -> None:
-        self.stat_frame = Frame(master=self)
-        self.stat_frame.grid(row=0, column=2, rowspan=2)
+        self.stat_frame = Frame(master=self, bg=Colors.green2)
+        self.stat_frame.grid(row=0, column=2, sticky=NSEW, padx=30)
 
-        yield_rate : float = self.master.metadata["yield rate"] * 100
-        pattern: List[List[List[float]]] = self.master.metadata["patterns"]
+        self.yield_rate : float = self.master.metadata["yield_rate"] * 100
 
-        Label(master=self.stat_frame, text="Pattern Stat").pack(padx=10, pady=4, anchor=N)
+        Label(master=self.stat_frame, text="Cutting Pattern Stat", font=Fonts.h3,
+              bg=Colors.green2, fg=Colors.white).pack(padx=12, pady=24, anchor=CENTER)
 
-        Label(master=self.stat_frame, text="Used Stock Ratio:").pack(padx=10, pady=4)
-        Label(master=self.stat_frame, text=f"{yield_rate:.2f}%").pack(padx=10)
+        Label(master=self.stat_frame, text="Used Stock Ratio:", font=Fonts.h4,
+              bg=Colors.green2, fg=Colors.white).pack(pady=4, anchor=NW)
+        Label(master=self.stat_frame, text=f"{self.yield_rate:.2f}%", font=Fonts.h5,
+              bg=Colors.green2, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
 
-        Label(master=self.stat_frame, text="Unused Stock Ratio:").pack(padx=10, pady=4)
-        Label(master=self.stat_frame, text=f"{100-yield_rate:.2f}%").pack(padx=10)
+        Label(master=self.stat_frame, text="Unused Stock Ratio:", font=Fonts.h4,
+              bg=Colors.green2, fg=Colors.white).pack(pady=(12, 4), anchor=NW)
+        Label(master=self.stat_frame, text=f"{100-self.yield_rate:.2f}%", font=Fonts.h5,
+              bg=Colors.green2, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
 
         self.button_save_plot = ButtonThemed(parent=self.stat_frame, text="Save Plot",
                                              bg=Colors.green1, fg=Colors.white,
                                              command=self.save_pattern_fig) 
-        self.button_save_plot.pack(padx=4, pady=8)
+        self.button_save_plot.pack(side=BOTTOM, padx=12, pady=(0, 24), anchor=S, fill=X)
+
+        self.button_save_metadata = ButtonThemed(parent=self.stat_frame, text="Save Metadata",
+                                             bg=Colors.green1, fg=Colors.white,
+                                             command=self.save_metadata) 
+        self.button_save_metadata.pack(side=BOTTOM, padx=12, pady=(0, 24), anchor=S, fill=X)
 
     def save_pattern_fig(self) -> None:
-        path = asksaveasfilename(title="Save Pattern Plot", initialdir="assets",
+        path = asksaveasfilename(title="Save Cutting Pattern Plot", initialdir="assets",
                                  initialfile="pattern.png", defaultextension= ".png",
                                  filetypes=[("Image files", "*.png")])
         if path:
@@ -194,6 +201,41 @@ class PatternPlot(Frame):
             showinfo(title="Save status", message=f"Saved at {path}")
         else:
             showinfo(title="Save status", message=f"Failed to save")
+
+    def save_metadata(self) -> None:
+        self.__metadata = {}
+        path = asksaveasfilename(title="Save Metadata", initialdir="assets",
+                                 initialfile="pattern.json", defaultextension= ".json",
+                                 filetypes=[("JSON File", "*.json")])
+        try:
+            if path:
+                self.__metadata = {
+                    "len_stocks_list" : self.stocks.copy(),
+                    "len_products_list" : self.master.metadata["len_products_list"].copy(),
+                    "len_products" : self.products.copy(),
+                    "amt_products" : self.master.metadata["amt_products"].copy(),
+                    "num_used_stock" : self.num_used_stock.copy(),
+                    "patterns" : self.patterns.copy(),
+                    "stock_color_label" : self.color_stock.copy(),
+                    "product_color_label" : self.color_product.copy(),
+                    "yield_rate" : self.yield_rate
+                }
+
+                with open(path, "w") as json_file:
+                    json.dump(obj=self.__metadata, fp=json_file)
+
+                showinfo(title="Save status", message=f"Saved at {path}")
+            else:
+                showinfo(title="Save status", message=f"Failed to save")
+
+        except AttributeError as ae:
+            showerror(title="Save Error", message=f"Attribute Error: {ae}")
+        except KeyError as ke:
+            showerror(title="Save Error", message=f"Key Error: Missing key in metadata: {ke}")
+        except IOError as io:
+            showerror(title="Save Error", message=f"File Error: Unable to write file: {io}")
+        except Exception as e:
+            showerror(title="Save Error", message=f"An unexpected error occurred: {e}")
             
 
     @staticmethod

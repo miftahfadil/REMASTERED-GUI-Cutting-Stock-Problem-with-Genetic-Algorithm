@@ -1,13 +1,17 @@
 from tkinter import *
+from tkinter.filedialog import askopenfilename
 from tkinter import colorchooser
 from typing import Dict
 from typing import List
 from typing import Tuple
+from typing import Literal
+from typing import Any
 
 from utils.theme import Colors
 from utils.theme import Fonts
 from utils.validate import validate_entry_len
 from utils.validate import validate_entry_amt
+from utils.load_json import load_json_data
 from .widgets import ButtonThemed
 from .widgets import DeleteAddColumn
 from .widgets import EntryThemed
@@ -19,25 +23,85 @@ class InitiateStockProduct(Frame):
     def __init__(self, parent: Tk) -> None:
         super(InitiateStockProduct, self).__init__(master=parent, bg=Colors.white)
 
-        self.rowconfigure((0), weight=1)
-        self.columnconfigure((0), weight=1)
+        self.rowconfigure((0, 1), weight=1)
+        self.columnconfigure((0, 1), weight=1)
 
         self.create_gui()
 
     def create_gui(self) -> None:
-        Label(master=self, text="Input Stock and Product Data", font=Fonts.h1,
-              bg=Colors.white, fg=Colors.green2).grid(row=0, column=0, columnspan=2, pady=(4, 28))
+        self.create_title()
 
-        self.input_stocks = InputFrame(parent=self, material="Stock")
-        self.input_stocks.grid(row=1, column=0, padx=10, sticky=NSEW)
-
-        self.input_products = InputFrame(parent=self, material="Product")
-        self.input_products.grid(row=1, column=1, padx=10, sticky=NSEW)
+        self.create_input_column()
 
         self.button_generate = ButtonThemed(parent=self, text="Generate Cutting Pattern", bg=Colors.yellow1,
                                 fg=Colors.white, command=self.get_stocks_products_input, width=30)
         self.button_generate.grid(row=2, column=0, columnspan=2, pady=24)
+
+    def create_title(self) -> None:
+        self.frame_title = Frame(self, bg=Colors.green2)
+        self.frame_title.grid(row=0, column=0, columnspan=2, sticky=NSEW)
+
+        Label(master=self.frame_title, text="Input Stock and Product Data", font=Fonts.h2,
+            bg=Colors.green2, fg=Colors.white).pack(padx=28, pady=(16, 6), anchor=W)
+        
+        Label(master=self.frame_title, text="Enter the stock and product details to generate cutting patterns. "
+                                            "This tool is designed to minimize waste by creating optimized cutting layouts.\n"
+                                            "You can also load existing metadata for a faster setup.",
+            font=Fonts.h5, bg=Colors.green2, fg=Colors.light_grey, justify=LEFT).pack(padx=28, pady=(0, 6), anchor=W)
+        
+        self.button_load_input = ButtonThemed(parent=self.frame_title, text="Load from Metadata", font=Fonts.h5,
+                                              bg=Colors.yellow1, fg=Colors.white, command=self.load_data_input, width=20)
+        self.button_load_input.pack(padx=28, pady=12, anchor=E)
+        
+    def create_input_column(self) -> None:
+        self.input_stocks = InputFrame(parent=self, material="Stock")
+        self.input_stocks.grid(row=1, column=0, padx=10, sticky=E)
+
+        self.input_products = InputFrame(parent=self, material="Product")
+        self.input_products.grid(row=1, column=1, padx=10, sticky=W)
+
+    def load_data_input(self) -> None:
+        path = askopenfilename(title="Load from Metadata", filetypes=[("JSON File", "*.json")],
+                            initialdir="assets")
+        self.metadata = load_json_data(path)
+
+        if self.metadata:
+            self.load_stock()
+            self.load_products()
+            
+    def load_stock(self) -> None:
+        for id in self.input_stocks.input_material_frames.keys():
+            self.input_stocks.input_material_frames[id].destroy()
+        
+        self.input_stocks.input_material_frames = {}
+
+        for (idx, len_stock) in enumerate(self.metadata["len_stocks_list"]):
+            self.input_stocks.button_del_add.add_frame()
+            self.input_stocks.input_material_frames[idx+1].entry_len.delete(0, END)
+            self.input_stocks.input_material_frames[idx+1].entry_len.insert(0, str(len_stock))
+            self.input_stocks.input_material_frames[idx+1].entry_len["fg"] = Colors.black
+
+            self.input_stocks.input_material_frames[idx+1].color["bg"] = self.metadata["stock_color_label"][idx]
     
+    def load_products(self) -> None:
+        for id in self.input_products.input_material_frames.keys():
+            self.input_products.input_material_frames[id].destroy()
+        
+        self.input_products.input_material_frames = {}
+
+        for (idx, len_product) in enumerate(self.metadata["len_products"]):
+            self.input_products.button_del_add.add_frame()
+            self.input_products.input_material_frames[idx+1].entry_len.delete(0, END)
+            self.input_products.input_material_frames[idx+1].entry_len.insert(0, str(len_product))
+            self.input_products.input_material_frames[idx+1].entry_len["fg"] = Colors.black
+
+            self.input_products.input_material_frames[idx+1].entry_amt.delete(0, END)
+            self.input_products.input_material_frames[idx+1].entry_amt.insert(0, str(self.metadata["amt_products"][idx]))
+            self.input_products.input_material_frames[idx+1].entry_amt["fg"] = Colors.black
+
+            self.input_products.input_material_frames[idx+1].color["bg"] = self.metadata["product_color_label"][idx]
+
+
     def get_stocks_products_input(self) -> None:
         self.master.stocks = self.get_stocks_input(self.input_stocks.input_material_frames)
         self.master.products = self.get_products_input(self.input_products.input_material_frames)
@@ -95,7 +159,7 @@ class InitiateStockProduct(Frame):
         
 class InputFrame(Frame):
     
-    def __init__(self, parent: Widget, material: str, bg: str = Colors.white, **kwargs) -> None:
+    def __init__(self, parent: Widget, material: Literal["Stock", "Product"], bg: str = Colors.white, **kwargs) -> None:
         super(InputFrame, self).__init__(master=parent, bg=bg, **kwargs)
         
         self.input_material_frames: Dict[int, Frame] = {}

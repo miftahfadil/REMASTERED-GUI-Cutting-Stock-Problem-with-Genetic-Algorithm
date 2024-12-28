@@ -2,19 +2,21 @@ from dataclasses import dataclass
 from colorsys import rgb_to_hls
 from colorsys import hls_to_rgb
 from typing import Tuple
+from typing import Literal
 
 
 @dataclass
 class Colors:
-    black: str = "#0d1914"
-    white: str = "#fbfbff"
+    black: Literal["#0d1914"] = "#0d1914"
+    white: Literal["#fbfbff"] = "#fbfbff"
+    light_grey: Literal["#CFCFCF"] = "#CFCFCF"
 
-    green1: str = "#6d9773"
-    green2: str = "#0c3a2d"
-    yellow1: str = "#ffb902"
-    yellow2: str = "#bb8a52"
+    green1: Literal["#6d9773"] = "#6d9773"
+    green2: Literal["#0c3a2d"] = "#0c3a2d"
+    yellow1: Literal["#ffb902"] = "#ffb902"
+    yellow2: Literal["#bb8a52"] = "#bb8a52"
 
-    red: str = '#ef233c'
+    red: Literal["#ef233c"] = "#ef233c"
 
 @dataclass
 class Fonts:

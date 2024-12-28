@@ -14,7 +14,7 @@ class MainWindow(Tk):
 
         self.title(string="Wasteless Cut")
         self.configure(bg=Colors.white)
-        self._width = 1000
+        self._width = 1200
         self._height = 700
         self._frames: Dict[str, Frame] = {}
 
@@ -39,7 +39,7 @@ class MainWindow(Tk):
         for frame in self._frames.values():
             frame.destroy()
         self._frames[name_frame] = new_frame(parent=self)
-        self._frames[name_frame].pack(expand=TRUE)
+        self._frames[name_frame].pack(fill=BOTH, expand=TRUE)
 
     
 

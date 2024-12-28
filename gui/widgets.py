@@ -1,7 +1,7 @@
 from tkinter import *
 from collections.abc import Callable
+from typing import Tuple
 from typing import Optional
-
 
 
 from utils.theme import Colors
@@ -11,9 +11,9 @@ from utils.theme import darken_hex_color
 
 class ButtonThemed(Button):
 
-    def __init__(self, parent: Widget, text:str, bg: str, fg: str, command: Callable, **kw):
-        super(ButtonThemed, self).__init__(master=parent, text=text, bg=bg, fg=fg,
-                                        command=command, font=Fonts.h4, relief=FLAT, **kw)
+    def __init__(self, parent: Widget, text:str, bg: str, fg: str, font: Tuple[str, int] = Fonts.h4, command: Callable = None, **kw):
+        super(ButtonThemed, self).__init__(master=parent, text=text, bg=bg, fg=fg, font=font,
+                                        command=command, relief=FLAT, **kw)
         
         self.defaultBG = self['bg']
         self.hoverBG = darken_hex_color(self['bg'])
@@ -62,7 +62,6 @@ class DeleteAddColumn(Frame):
             self.parent.input_material_frames[id].pack(pady=8)
         
 
-from typing import Callable, Optional
 
 
 class EntryThemed(Entry):
