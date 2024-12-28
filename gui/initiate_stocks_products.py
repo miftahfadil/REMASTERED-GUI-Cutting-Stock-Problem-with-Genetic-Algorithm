@@ -33,24 +33,35 @@ class InitiateStockProduct(Frame):
 
         self.create_input_column()
 
+        self.generate_icon = PhotoImage(file="assets/generate icon.png").subsample(3, 3)
+
         self.button_generate = ButtonThemed(parent=self, text="Generate Cutting Pattern", bg=Colors.yellow1,
-                                fg=Colors.white, command=self.get_stocks_products_input, width=30)
+                                fg=Colors.white, image=self.generate_icon, command=self.get_stocks_products_input, width=200)
         self.button_generate.grid(row=2, column=0, columnspan=2, pady=24)
 
     def create_title(self) -> None:
         self.frame_title = Frame(self, bg=Colors.green2)
         self.frame_title.grid(row=0, column=0, columnspan=2, sticky=NSEW)
 
+        self.back_icon = PhotoImage(file="assets/back icon.png").subsample(4, 4)
+
+        self.button_back = ButtonThemed(parent=self.frame_title, text="Menu", bg=Colors.yellow1, fg=Colors.white, width=50,
+                                    image=self.back_icon, font=Fonts.h5, command=self.master.create_gui)
+        self.button_back.pack(padx=12, pady=12, anchor=W)
+
         Label(master=self.frame_title, text="Input Stock and Product Data", font=Fonts.h2,
-            bg=Colors.green2, fg=Colors.white).pack(padx=28, pady=(16, 6), anchor=W)
+            bg=Colors.green2, fg=Colors.white).pack(padx=28, pady=(4, 6), anchor=W)
         
         Label(master=self.frame_title, text="Enter the stock and product details to generate cutting patterns. "
                                             "This tool is designed to minimize waste by creating optimized cutting layouts.\n"
                                             "You can also load existing metadata for a faster setup.",
-            font=Fonts.h5, bg=Colors.green2, fg=Colors.light_grey, justify=LEFT).pack(padx=28, pady=(0, 6), anchor=W)
+            font=Fonts.h5, bg=Colors.green2, fg=Colors.light_grey1, justify=LEFT).pack(padx=28, pady=(0, 6), anchor=W)
         
-        self.button_load_input = ButtonThemed(parent=self.frame_title, text="Load from Metadata", font=Fonts.h5,
-                                              bg=Colors.yellow1, fg=Colors.white, command=self.load_data_input, width=20)
+        self.load_data_icon = PhotoImage(file="assets/load data icon.png").subsample(4, 4)
+
+        self.button_load_input = ButtonThemed(parent=self.frame_title, text="Load from Metadata",
+                                              font=Fonts.h5, bg=Colors.yellow1, fg=Colors.white,
+                                              image=self.load_data_icon, command=self.load_data_input, width=150)
         self.button_load_input.pack(padx=28, pady=12, anchor=E)
         
     def create_input_column(self) -> None:
@@ -62,7 +73,7 @@ class InitiateStockProduct(Frame):
 
     def load_data_input(self) -> None:
         path = askopenfilename(title="Load from Metadata", filetypes=[("JSON File", "*.json")],
-                            initialdir="assets")
+                            initialdir="results")
         self.metadata = load_json_data(path)
 
         if self.metadata:
@@ -179,7 +190,7 @@ class InputFrame(Frame):
     def create_scrollable(self) -> None:
         self.scroll = Scrollbar(self, orient=VERTICAL)
         self.scroll.grid(row=0, column=1, sticky='NSW')
-        self.canvas = Canvas(self, bg=Colors.white, height=400, yscrollcommand=self.scroll.set, highlightthickness=0)
+        self.canvas = Canvas(self, bg=Colors.white, height=350, yscrollcommand=self.scroll.set, highlightthickness=0)
         self.canvas.grid(row=0, column=0, pady=12, padx=12, sticky=NSEW)
         self.scroll.config(command=self.canvas.yview)
         self.frame = Frame(self.canvas, bg=self["bg"])

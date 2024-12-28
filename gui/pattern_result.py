@@ -22,23 +22,27 @@ from algorithm.genetic_algorithm import genetic_algorithm
 
 class PatternResult(Frame):
 
-    def __init__(self, parent: Tk, bg:str = Colors.white, **kwargs) -> None:
-        super(PatternResult, self).__init__(master=parent, bg=bg)
+    def __init__(self, parent: Tk, bg:str = Colors.white,  **kwargs) -> None:
+        super(PatternResult, self).__init__(master=parent, bg=bg, **kwargs)
 
-        self.metadata: Dict[str, List[int]|List[float]|Any] = genetic_algorithm(len_stock_list=self.master.stocks[0],
-                                                            len_product_list=self.master.products[2])
+        if self.master.stocks and self.master.products:
 
-        self.metadata["len_products"] = self.master.products[0].copy()
-        self.metadata["amt_products"] = self.master.products[1].copy()
-        self.metadata["len_products_list"] = self.master.products[2].copy()
-        self.metadata["product_color_label"] = self.master.products[3].copy()
-        self.metadata["stock_color_label"] = self.master.stocks[1].copy()
+            self.metadata: Dict[str, List[int]|List[float]|Any] = genetic_algorithm(len_stock_list=self.master.stocks[0],
+                                                                len_product_list=self.master.products[2])
+
+            self.metadata["len_products"] = self.master.products[0].copy()
+            self.metadata["amt_products"] = self.master.products[1].copy()
+            self.metadata["len_products_list"] = self.master.products[2].copy()
+            self.metadata["product_color_label"] = self.master.products[3].copy()
+            self.metadata["stock_color_label"] = self.master.stocks[1].copy()
 
         self.create_gui()
 
     def create_gui(self) -> None:
-        self.button_back = ButtonThemed(parent=self, text="Back",
-                                    bg=Colors.yellow1, fg=Colors.white, command=self.master.create_gui)
+        self.back_icon = PhotoImage(file="assets/back icon.png").subsample(4, 4)
+
+        self.button_back = ButtonThemed(parent=self, text="Menu", bg=Colors.yellow1, fg=Colors.white, width=50,
+                                    image=self.back_icon, font=Fonts.h5, command=self.master.create_gui)
         self.button_back.pack(padx=20, pady=12, anchor=W)
 
         Label(master=self, text="Cutting Pattern Result", font=Fonts.h1,
@@ -68,7 +72,7 @@ class PatternPlot(Frame):
         self.display_stat()
 
     def create_scrollable(self) -> None:
-        self.canvas = Canvas(master=self, height=500, width=800, bg=Colors.white)
+        self.canvas = Canvas(master=self, height=500, width=800, bg="white")
         self.canvas.grid(row=0, column=0, sticky=NSEW)
 
         y_scrollbar = ttk.Scrollbar(master=self, orient=VERTICAL, command=self.canvas.yview)
@@ -182,13 +186,15 @@ class PatternPlot(Frame):
         Label(master=self.stat_frame, text=f"{100-self.yield_rate:.2f}%", font=Fonts.h5,
               bg=Colors.green2, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
 
+        self.save_icon = PhotoImage(file="assets/save icon.png").subsample(4, 4)
+
         self.button_save_plot = ButtonThemed(parent=self.stat_frame, text="Save Plot",
-                                             bg=Colors.green1, fg=Colors.white,
+                                             bg=Colors.green1, fg=Colors.white, image=self.save_icon,
                                              command=self.save_pattern_fig) 
         self.button_save_plot.pack(side=BOTTOM, padx=12, pady=(0, 24), anchor=S, fill=X)
 
         self.button_save_metadata = ButtonThemed(parent=self.stat_frame, text="Save Metadata",
-                                             bg=Colors.green1, fg=Colors.white,
+                                             bg=Colors.green1, fg=Colors.white, image=self.save_icon,
                                              command=self.save_metadata) 
         self.button_save_metadata.pack(side=BOTTOM, padx=12, pady=(0, 24), anchor=S, fill=X)
 
@@ -204,7 +210,7 @@ class PatternPlot(Frame):
 
     def save_metadata(self) -> None:
         self.__metadata = {}
-        path = asksaveasfilename(title="Save Metadata", initialdir="assets",
+        path = asksaveasfilename(title="Save Metadata", initialdir="results",
                                  initialfile="pattern.json", defaultextension= ".json",
                                  filetypes=[("JSON File", "*.json")])
         try:

@@ -4,7 +4,7 @@ from typing import List
 from typing import Tuple
 
 from utils.theme import Colors
-from .initiate_stocks_products import InitiateStockProduct
+from .menu import MainMenu
 
 
 class MainWindow(Tk):
@@ -32,7 +32,7 @@ class MainWindow(Tk):
         self.geometry(f"{_width}x{_height}+{x_corner}+{y_corner}")
     
     def create_gui(self) -> None:
-        self.switch_frame(name_frame="Initiate Frame", new_frame=InitiateStockProduct)
+        self.switch_frame(name_frame="Menu", new_frame=MainMenu)
         
 
     def switch_frame(self, name_frame:str, new_frame: Frame) -> None:
