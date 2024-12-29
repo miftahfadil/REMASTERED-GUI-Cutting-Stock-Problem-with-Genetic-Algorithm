@@ -4,12 +4,17 @@ from utils.theme import Colors
 from utils.theme import Fonts
 from .widgets import ButtonThemed
 from .initiate_stocks_products import InitiateStockProduct
+from .load_metadata import LoadMetadata
 
 
 class MainMenu(Frame):
 
     def __init__(self, parent: Tk) -> None:
         super(MainMenu, self).__init__(master=parent, bg=Colors.white)
+
+        self.master.stocks = None
+        self.master.products = None
+        self.master.metadata = None
 
         self.create_title()
         self.create_content()
@@ -23,7 +28,7 @@ class MainMenu(Frame):
               font=Fonts.h1).grid(row=0, column=0, sticky=NS)
         
         Label(self.title_frame, text="", bg=Colors.green1,
-              font=Fonts.h1).grid(row=0, column=1, sticky=NS)
+              font=Fonts.h1).grid(row=0, column=1, padx=2, sticky=NS)
         
         Label(self.title_frame, text="Cut", bg=self["bg"], fg=Colors.black,
               font=Fonts.h1).grid(row=0, column=2, sticky=NS)
@@ -45,7 +50,7 @@ class MainMenu(Frame):
         self.create_new_icon = PhotoImage(file="assets/create new icon.png").subsample(2, 2)
         self.button_create_new = ButtonThemed(self.button1_frame, text="", bg=Colors.green1, fg=Colors.white,
                                               image=self.create_new_icon, width=64, height=64,
-                                              command=lambda: self.master.switch_frame(name_frame="", new_frame=InitiateStockProduct))
+                                              command=lambda: self.master.switch_frame(name_frame="Input Data Frame", new_frame=InitiateStockProduct))
         self.button_create_new.grid(row=0, column=0, sticky=W)
        
         self.button1_frame.text = Label(self.button1_frame, text="", font=Fonts.h4, width=20, anchor=W,
@@ -54,7 +59,8 @@ class MainMenu(Frame):
 
         self.load_metadata_icon = PhotoImage(file="assets/load metadata icon.png").subsample(2, 2)
         self.button_load_metadata = ButtonThemed(self.button2_frame, text="", bg=Colors.green1, fg=Colors.white,
-                                              image=self.load_metadata_icon, command=None, width=64, height=64)
+                                              image=self.load_metadata_icon, width=64, height=64,
+                                              command=lambda: self.master.switch_frame(name_frame="Load Data Frame", new_frame=LoadMetadata))
         self.button_load_metadata.grid(row=0, column=0, sticky=W)
 
         self.button2_frame.text = Label(self.button2_frame, text="", font=Fonts.h4, width=20, anchor=W,

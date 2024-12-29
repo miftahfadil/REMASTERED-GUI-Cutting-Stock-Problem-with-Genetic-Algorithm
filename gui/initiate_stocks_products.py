@@ -1,11 +1,11 @@
 from tkinter import *
-from tkinter.filedialog import askopenfilename
 from tkinter import colorchooser
+from tkinter.filedialog import askopenfilename
+from tkinter.messagebox import showerror
 from typing import Dict
 from typing import List
 from typing import Tuple
 from typing import Literal
-from typing import Any
 
 from utils.theme import Colors
 from utils.theme import Fonts
@@ -20,8 +20,8 @@ from .pattern_result import PatternResult
 
 class InitiateStockProduct(Frame):
 
-    def __init__(self, parent: Tk) -> None:
-        super(InitiateStockProduct, self).__init__(master=parent, bg=Colors.white)
+    def __init__(self, parent: Tk, **kwargs) -> None:
+        super(InitiateStockProduct, self).__init__(master=parent, bg=Colors.white, **kwargs)
 
         self.rowconfigure((0, 1), weight=1)
         self.columnconfigure((0, 1), weight=1)
@@ -35,34 +35,46 @@ class InitiateStockProduct(Frame):
 
         self.generate_icon = PhotoImage(file="assets/generate icon.png").subsample(3, 3)
 
-        self.button_generate = ButtonThemed(parent=self, text="Generate Cutting Pattern", bg=Colors.yellow1,
+        self.button_generate = ButtonThemed(parent=self, text="Generate Cutting Pattern", bg=Colors.green1,
                                 fg=Colors.white, image=self.generate_icon, command=self.get_stocks_products_input, width=200)
         self.button_generate.grid(row=2, column=0, columnspan=2, pady=24)
 
     def create_title(self) -> None:
-        self.frame_title = Frame(self, bg=Colors.green2)
+        self.frame_title = Frame(self, bg=self["bg"])
         self.frame_title.grid(row=0, column=0, columnspan=2, sticky=NSEW)
+
+        self.upper_frame_title = Frame(self.frame_title, bg=self["bg"])
+        self.upper_frame_title.pack(padx=12, pady=12, anchor=NW, fill=X, expand=TRUE)
 
         self.back_icon = PhotoImage(file="assets/back icon.png").subsample(4, 4)
 
-        self.button_back = ButtonThemed(parent=self.frame_title, text="Menu", bg=Colors.yellow1, fg=Colors.white, width=50,
+        self.button_back = ButtonThemed(parent=self.upper_frame_title, text="Menu", bg=Colors.green1, fg=Colors.white, width=50,
                                     image=self.back_icon, font=Fonts.h5, command=self.master.create_gui)
-        self.button_back.pack(padx=12, pady=12, anchor=W)
+        self.button_back.grid(row=0, column=0, padx=(0, 24), sticky=W)
 
-        Label(master=self.frame_title, text="Input Stock and Product Data", font=Fonts.h2,
-            bg=Colors.green2, fg=Colors.white).pack(padx=28, pady=(4, 6), anchor=W)
+        Label(self.upper_frame_title, text="Wasteless", bg=self["bg"], fg=Colors.black,
+              font=Fonts.h5).grid(row=0, column=1, sticky=NS)
+        
+        Label(self.upper_frame_title, text="", bg=Colors.green1,
+              font=Fonts.h5).grid(row=0, column=2, padx=2)
+        
+        Label(self.upper_frame_title, text="Cut", bg=self["bg"], fg=Colors.black,
+              font=Fonts.h5).grid(row=0, column=3, sticky=NS)
+
+        Label(master=self.frame_title, text="Input Stock and Product Data", font=Fonts.h1,
+            bg=self["bg"], fg=Colors.green2).pack(padx=48, pady=(4, 6), anchor=CENTER)
         
         Label(master=self.frame_title, text="Enter the stock and product details to generate cutting patterns. "
                                             "This tool is designed to minimize waste by creating optimized cutting layouts.\n"
                                             "You can also load existing metadata for a faster setup.",
-            font=Fonts.h5, bg=Colors.green2, fg=Colors.light_grey1, justify=LEFT).pack(padx=28, pady=(0, 6), anchor=W)
+            font=Fonts.h5, bg=self["bg"], fg=Colors.light_grey2, justify=CENTER).pack(padx=48, pady=(0, 6), anchor=CENTER)
         
         self.load_data_icon = PhotoImage(file="assets/load data icon.png").subsample(4, 4)
 
         self.button_load_input = ButtonThemed(parent=self.frame_title, text="Load from Metadata",
-                                              font=Fonts.h5, bg=Colors.yellow1, fg=Colors.white,
+                                              font=Fonts.h5, bg=Colors.green1, fg=Colors.white,
                                               image=self.load_data_icon, command=self.load_data_input, width=150)
-        self.button_load_input.pack(padx=28, pady=12, anchor=E)
+        self.button_load_input.pack(padx=12, pady=12, anchor=E)
         
     def create_input_column(self) -> None:
         self.input_stocks = InputFrame(parent=self, material="Stock")
@@ -112,13 +124,44 @@ class InitiateStockProduct(Frame):
 
             self.input_products.input_material_frames[idx+1].color["bg"] = self.metadata["product_color_label"][idx]
 
-
     def get_stocks_products_input(self) -> None:
-        self.master.stocks = self.get_stocks_input(self.input_stocks.input_material_frames)
-        self.master.products = self.get_products_input(self.input_products.input_material_frames)
-        self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult)
+        try:
+            # Validasi dan pengambilan input stok
+            self.master.stocks = self.get_stocks_input(self.input_stocks.input_material_frames)
+            if not self.master.stocks[0] or not all(isinstance(stock, (int, float)) and stock > 0 for stock in self.master.stocks[0]):
+                raise ValueError("Stock length inputs must be a list of positive numbers.")
+            
+            # Validasi dan pengambilan input produk
+            self.master.products = self.get_products_input(self.input_products.input_material_frames)
+            if not self.master.products[0] or not all(isinstance(product, (float, int)) and product > 0 for product in self.master.products[0]):
+                raise ValueError("Product length inputs must be a list of positive numbers.")
+            
+            if not self.master.products[1] or not all(isinstance(product, int) and product > 0 for product in self.master.products[1]):
+                raise ValueError("Product amount inputs must be a list of positive integers.")
+            
+            # Validasi tambahan: apakah produk dapat dipotong dari stok
+            if any(product > max(self.master.stocks[0]) for product in self.master.products[2]):
+                raise ValueError("One or more products exceed the maximum stock length.")
 
-    def get_stocks_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|None:
+            # Berpindah ke frame hasil
+            self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult)
+        
+        except ValueError as ve:
+            # Tangkap ValueError untuk validasi input
+            showerror("Input Error", str(ve))
+        
+        except Exception as e:
+            # Tangkap error lain yang tidak terduga
+            showerror("Unexpected Error", f"An unexpected error occurred: {str(e)}")
+
+
+    # def get_stocks_products_input(self) -> None:
+        # self.master.stocks = self.get_stocks_input(self.input_stocks.input_material_frames)
+        # self.master.products = self.get_products_input(self.input_products.input_material_frames)
+        # self.master.switch_frame(name_frame="Pattern Result", new_frame=PatternResult)
+    #     
+
+    def get_stocks_input(self, input_material_frames: Dict[int, Frame]) -> List[float]|List[str]|None:
         material_list: List[float] = []
         color_list: List[str] = []
 
@@ -138,7 +181,7 @@ class InitiateStockProduct(Frame):
 
         return material_list, color_list
     
-    def get_products_input(self, input_material_frames: Dict[int, Frame]) -> Tuple[List[float]|List[int]]|None:
+    def get_products_input(self, input_material_frames: Dict[int, Frame]) -> Tuple[List[float]|List[int]|List[str]]|None:
         material_list: List[float] = []
         material_lengths: List[float] = []
         material_amounts: List[int] = []
@@ -190,7 +233,7 @@ class InputFrame(Frame):
     def create_scrollable(self) -> None:
         self.scroll = Scrollbar(self, orient=VERTICAL)
         self.scroll.grid(row=0, column=1, sticky='NSW')
-        self.canvas = Canvas(self, bg=Colors.white, height=350, yscrollcommand=self.scroll.set, highlightthickness=0)
+        self.canvas = Canvas(self, bg=Colors.white, height=300, yscrollcommand=self.scroll.set, highlightthickness=0)
         self.canvas.grid(row=0, column=0, pady=12, padx=12, sticky=NSEW)
         self.scroll.config(command=self.canvas.yview)
         self.frame = Frame(self.canvas, bg=self["bg"])
@@ -233,7 +276,7 @@ class MaterialColumn(Frame):
     def create_column(self) -> None:
         self.len_column()
         if self.material == "Product":
-            self.color["bg"] = "#87ceeb"
+            self.color["bg"] = "#6d9773"
             self.amt_column()
     
     def len_column(self) -> None:

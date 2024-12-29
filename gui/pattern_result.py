@@ -35,27 +35,49 @@ class PatternResult(Frame):
             self.metadata["len_products_list"] = self.master.products[2].copy()
             self.metadata["product_color_label"] = self.master.products[3].copy()
             self.metadata["stock_color_label"] = self.master.stocks[1].copy()
+        
+        elif self.master.metadata:
+            self.metadata = self.master.metadata
 
         self.create_gui()
 
     def create_gui(self) -> None:
+        self.frame_title = Frame(self, bg=self["bg"])
+        self.frame_title.pack(anchor=NW, fill=BOTH)
+
+        self.upper_frame_title = Frame(self.frame_title, bg=self["bg"])
+        self.upper_frame_title.pack(padx=12, pady=12, anchor=NW, fill=X)
+
         self.back_icon = PhotoImage(file="assets/back icon.png").subsample(4, 4)
 
-        self.button_back = ButtonThemed(parent=self, text="Menu", bg=Colors.yellow1, fg=Colors.white, width=50,
+        self.button_back = ButtonThemed(parent=self.upper_frame_title, text="Menu", bg=Colors.green1, fg=Colors.white, width=50,
                                     image=self.back_icon, font=Fonts.h5, command=self.master.create_gui)
-        self.button_back.pack(padx=20, pady=12, anchor=W)
+        self.button_back.grid(row=0, column=0, padx=(0, 24), sticky=W)
 
-        Label(master=self, text="Cutting Pattern Result", font=Fonts.h1,
-            bg=Colors.white, fg=Colors.green2).pack(fill=X, pady=(4, 24))
+        Label(self.upper_frame_title, text="Wasteless", bg=self["bg"], fg=Colors.black,
+              font=Fonts.h5).grid(row=0, column=1, sticky=NS)
+        
+        Label(self.upper_frame_title, text="", bg=Colors.green1,
+              font=Fonts.h5).grid(row=0, column=2, padx=2)
+        
+        Label(self.upper_frame_title, text="Cut", bg=self["bg"], fg=Colors.black,
+              font=Fonts.h5).grid(row=0, column=3, sticky=NS)
+
+        Label(master=self.frame_title, text="Cutting Pattern Result", font=Fonts.h1,
+            bg=self["bg"], fg=Colors.green2).pack(anchor=N, pady=(24, 4))
+        
+        Label(master=self.frame_title, text=f"Here the optimized cutting patterns that reduce the unused stock ratio. "
+                                             "You can also save the plot and metadata to keep track or use them later.",
+              font=Fonts.h5, bg=self["bg"], fg=Colors.light_grey2).pack(anchor=N, pady=(4, 24))
 
         pattern_plot = PatternPlot(parent=self)
-        pattern_plot.pack(padx=10, pady=10, fill=BOTH)
+        pattern_plot.pack(padx=10, pady=10, anchor=N, fill=BOTH)
 
 
 class PatternPlot(Frame):
 
     def __init__(self, parent: Widget, **kwargs) -> None:
-        super(PatternPlot, self).__init__(master=parent, bg=Colors.green2, **kwargs)
+        super(PatternPlot, self).__init__(master=parent, bg=Colors.black, **kwargs)
         self.stocks: List[float] = self.master.metadata["len_stocks_list"].copy()
         self.products: List[float] = self.master.metadata["len_products"].copy()
         self.num_used_stock: List[float] = self.master.metadata["num_used_stock"].copy()
@@ -81,7 +103,7 @@ class PatternPlot(Frame):
         self.canvas.configure(yscrollcommand=y_scrollbar.set)
 
         self.inner_canvas = ttk.Frame(self.canvas)
-        self.canvas.create_window((0,0), window=self.inner_canvas, anchor=NW)
+        self.canvas.create_window((0, 0), window=self.inner_canvas, anchor=NW)
 
         self.inner_canvas.bind("<Configure>", self.update_scroll_region)
     
@@ -168,38 +190,38 @@ class PatternPlot(Frame):
         return fig
 
     def display_stat(self) -> None:
-        self.stat_frame = Frame(master=self, bg=Colors.green2)
+        self.stat_frame = Frame(master=self, bg=Colors.black)
         self.stat_frame.grid(row=0, column=2, sticky=NSEW, padx=30)
 
         self.yield_rate : float = self.master.metadata["yield_rate"] * 100
 
         Label(master=self.stat_frame, text="Cutting Pattern Stat", font=Fonts.h3,
-              bg=Colors.green2, fg=Colors.white).pack(padx=12, pady=24, anchor=CENTER)
+              bg=Colors.black, fg=Colors.white).pack(padx=12, pady=24, anchor=CENTER)
 
         Label(master=self.stat_frame, text="Used Stock Ratio:", font=Fonts.h4,
-              bg=Colors.green2, fg=Colors.white).pack(pady=4, anchor=NW)
+              bg=Colors.black, fg=Colors.white).pack(pady=4, anchor=NW)
         Label(master=self.stat_frame, text=f"{self.yield_rate:.2f}%", font=Fonts.h5,
-              bg=Colors.green2, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
+              bg=Colors.black, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
 
         Label(master=self.stat_frame, text="Unused Stock Ratio:", font=Fonts.h4,
-              bg=Colors.green2, fg=Colors.white).pack(pady=(12, 4), anchor=NW)
+              bg=Colors.black, fg=Colors.white).pack(pady=(12, 4), anchor=NW)
         Label(master=self.stat_frame, text=f"{100-self.yield_rate:.2f}%", font=Fonts.h5,
-              bg=Colors.green2, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
+              bg=Colors.black, fg=Colors.white).pack(pady=(4, 12), anchor=NW)
 
         self.save_icon = PhotoImage(file="assets/save icon.png").subsample(4, 4)
 
         self.button_save_plot = ButtonThemed(parent=self.stat_frame, text="Save Plot",
-                                             bg=Colors.green1, fg=Colors.white, image=self.save_icon,
+                                             bg=Colors.green2, fg=Colors.white, image=self.save_icon,
                                              command=self.save_pattern_fig) 
         self.button_save_plot.pack(side=BOTTOM, padx=12, pady=(0, 24), anchor=S, fill=X)
 
         self.button_save_metadata = ButtonThemed(parent=self.stat_frame, text="Save Metadata",
-                                             bg=Colors.green1, fg=Colors.white, image=self.save_icon,
+                                             bg=Colors.green2, fg=Colors.white, image=self.save_icon,
                                              command=self.save_metadata) 
         self.button_save_metadata.pack(side=BOTTOM, padx=12, pady=(0, 24), anchor=S, fill=X)
 
     def save_pattern_fig(self) -> None:
-        path = asksaveasfilename(title="Save Cutting Pattern Plot", initialdir="assets",
+        path = asksaveasfilename(title="Save Cutting Pattern Plot", initialdir="results",
                                  initialfile="pattern.png", defaultextension= ".png",
                                  filetypes=[("Image files", "*.png")])
         if path:
@@ -224,7 +246,7 @@ class PatternPlot(Frame):
                     "patterns" : self.patterns.copy(),
                     "stock_color_label" : self.color_stock.copy(),
                     "product_color_label" : self.color_product.copy(),
-                    "yield_rate" : self.yield_rate
+                    "yield_rate" : self.yield_rate / 100
                 }
 
                 with open(path, "w") as json_file:

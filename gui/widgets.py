@@ -11,14 +11,16 @@ from utils.theme import darken_hex_color
 
 class ButtonThemed(Button):
 
-    def __init__(self, parent: Widget, text:str, bg: str, fg: str, font: Tuple[str, int] = Fonts.h4, image: str = "", command: Callable = None, **kw):
+    def __init__(self, parent: Widget, text:str, bg: str, fg: str,
+                 font: Tuple[str, int] = Fonts.h4, image: str = "",
+                 hover_reduction: float = 0.2, command: Callable = None, **kw):
         super(ButtonThemed, self).__init__(master=parent, text=text, bg=bg, fg=fg, font=font, image=image,
                                         command=command, relief=FLAT, **kw)
         if image != "":
             self.configure(compound=LEFT, padx=8)
 
         self.defaultBG = self['bg']
-        self.hoverBG = darken_hex_color(self['bg'])
+        self.hoverBG = darken_hex_color(self['bg'], reduction=hover_reduction)
 
         self.bind('<Enter>', self.on_button_hover)
         self.bind('<Leave>', self.on_button_leave)
@@ -42,12 +44,13 @@ class DeleteAddColumn(Frame):
         self.del_icon = PhotoImage(file="assets/delete icon.png").subsample(4, 4)
         self.add_icon = PhotoImage(file="assets/add icon.png").subsample(4, 4)
 
-        self.button_del = ButtonThemed(parent=self, text="Delete Previous", bg=Colors.red,
-                                       fg=Colors.white, image=self.del_icon, command=self.delete_frame, width=150)
+        self.button_del = ButtonThemed(parent=self, text="Delete Previous", bg=Colors.light_grey2, font=Fonts.h5,
+                                       fg=Colors.white, image=self.del_icon, command=self.delete_frame, width=120)
         self.button_del.grid(row=0, column=0, padx=4, pady=4)
 
-        self.button_add = ButtonThemed(parent=self, text="Add Next", bg=Colors.green1,
-                                       fg=Colors.white, image=self.add_icon, command=self.add_frame, width=150)
+        self.button_add = ButtonThemed(parent=self, text="Add Next", bg=Colors.black, font=Fonts.h5,
+                                       fg=Colors.white, image=self.add_icon,
+                                       hover_reduction=-1.2, command=self.add_frame, width=120)
         self.button_add.grid(row=0, column=1, padx=4, pady=4)
     
     def delete_frame(self) -> None:
@@ -71,7 +74,7 @@ class DeleteAddColumn(Frame):
 
 class EntryThemed(Entry):
 
-    def __init__(self, parent: Widget, placeholder: str = "", highlight_color: str = Colors.yellow1, 
+    def __init__(self, parent: Widget, placeholder: str = "", highlight_color: str = Colors.black, 
                  border_color: str = "#CCCCCC", command: Optional[Callable] = None, **kw):
         super(EntryThemed, self).__init__(parent, **kw)
 

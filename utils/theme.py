@@ -9,8 +9,9 @@ from typing import Literal
 class Colors:
     black: Literal["#0d1914"] = "#0d1914"
     white: Literal["#fbfbff"] = "#fbfbff"
-    light_grey1: Literal["#CFCFCF"] = "#CFCFCF"
+    light_grey1: Literal["#cfcfcf"] = "#cfcfcf"
     light_grey2: Literal["#858585"] = "#858585"
+    light_grey3: Literal["#363636"] = "#363636"
 
     green1: Literal["#6d9773"] = "#6d9773"
     green2: Literal["#0c3a2d"] = "#0c3a2d"
