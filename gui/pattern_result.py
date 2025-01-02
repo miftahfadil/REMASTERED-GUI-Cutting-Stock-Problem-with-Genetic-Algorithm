@@ -233,7 +233,7 @@ class PatternPlot(Frame):
     def save_metadata(self) -> None:
         self.__metadata = {}
         path = asksaveasfilename(title="Save Metadata", initialdir="results",
-                                 initialfile="pattern.json", defaultextension= ".json",
+                                 initialfile="metadata.json", defaultextension= ".json",
                                  filetypes=[("JSON File", "*.json")])
         try:
             if path:
